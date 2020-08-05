@@ -1,0 +1,13 @@
+---
+# defaults file for server_create
+server_name_main: "auto"
+server_name_slave_1: "auto-slave1"
+server_name_slave_2: "auto-slave2"
+ansible_ssh_private_key_file: "/home/ubuntu/KeyPair.pem"
+server_net_id: "c6b2dbc9-ca80-4b49-bbbb-85ea9b96f8b3"
+server_vpc_id: "26ca2783-dc40-4e3a-95b1-5a0756441e12"
+security_groups: "sg-1"
+Keypair: "KeyPair"
+server_flavor: "s2.medium.1"
+volume_size: 20
+server_image: 2a9491a1-8ab1-4b12-a10b-59a32f5ff38d

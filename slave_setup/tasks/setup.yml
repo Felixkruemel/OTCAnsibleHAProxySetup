@@ -1,0 +1,22 @@
+---
+# tasks file for server_create
+- name: Waiting for Connection to Server...
+  wait_for:
+    port: 22
+    host: "{{ ansible_main_host }}"
+    timeout: 300
+
+- name: Trying Ping...
+  ping:
+
+- name: Updating sources.list...
+  apt:
+    update_cache: yes
+
+- name: Installing latest Apache
+  package:
+   name: "apache2"
+   state: latest
+
+- name: Creating default page...
+  template: src=index.html.j2 dest=/var/www/html/index.html

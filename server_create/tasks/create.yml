@@ -1,0 +1,90 @@
+---
+# tasks file for server_create
+
+- name: Creating Main Server...
+  os_server:
+    state: present
+    name: "{{server_name_main}}"
+    image: "{{server_image}}"
+    key_name: "{{Keypair}}"
+    flavor: "{{server_flavor}}"
+    boot_from_volume: true
+    volume_size: "{{volume_size}}"
+    nics: 
+      - net-id: "{{server_net_id}}"
+    floating_ips:
+      - 80.158.38.228
+    security_groups: "{{ security_groups }}"
+  register: main_server
+
+- debug:
+    var: main_server
+- debug:
+    msg: "{{ main_server['server']['addresses'][server_vpc_id][0]['addr'] }}"
+
+- name: Adding Server to Inventory...
+  add_host:
+    hostname: "{{ server_name_main }}"
+    ansible_host: 80.158.38.228
+    groups: servers
+
+
+- name: Creating Slave Server 1...
+  os_server:
+    state: present
+    name: "{{server_name_slave_1}}"
+    image: "{{server_image}}"
+    key_name: "{{Keypair}}"
+    flavor: "{{server_flavor}}"
+    boot_from_volume: true
+    volume_size: "{{volume_size}}"
+    auto_ip: false
+    nics:
+      - net-id: "{{ server_net_id }}"
+    security_groups: "{{ security_groups }}"
+  register: slave_server_1
+
+- debug:
+    msg: "{{ slave_server_1['server']['addresses'][server_vpc_id][0]['addr'] }}"
+
+- name: Adding Server to Inventory...
+  add_host:
+    hostname: "{{ server_name_slave_1 }}"
+    ansible_host: "{{ slave_server_1['server']['addresses'][server_vpc_id][0]['addr'] }}"
+    groups: slaves
+
+
+- name: Creating Slave Server 2...
+  os_server:
+    state: present
+    name: "{{server_name_slave_2}}"
+    image: "{{server_image}}"
+    key_name: "{{Keypair}}"
+    flavor: "{{server_flavor}}"
+    boot_from_volume: true
+    volume_size: "{{volume_size}}"
+    auto_ip: false
+    nics:
+      - net-id: "{{ server_net_id }}"
+    security_groups: "{{ security_groups }}"
+  register: slave_server_2
+
+- debug:
+    msg: "{{ slave_server_2['server']['addresses'][server_vpc_id][0]['addr'] }}"
+
+- name: Adding Server to Inventory...
+  add_host:
+    hostname: "{{ server_name_slave_2 }}"
+    ansible_host: "{{ slave_server_2['server']['addresses'][server_vpc_id][0]['addr'] }}"
+    groups: slaves
+
+- name: Saving important Variables...
+  set_fact:
+    ip_main_server: "{{ main_server['server']['addresses'][server_vpc_id][0]['addr'] }}"
+    ip_slave_server_1: "{{ slave_server_1['server']['addresses'][server_vpc_id][0]['addr'] }}"
+    ip_slave_server_2: "{{ slave_server_2['server']['addresses'][server_vpc_id][0]['addr'] }}"
+
+- name: Waiting for Server setup to finish...
+  wait_for:
+    timeout: 10
+  delegate_to: localhost

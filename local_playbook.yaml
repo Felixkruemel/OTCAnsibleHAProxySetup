@@ -1,0 +1,14 @@
+- hosts: local
+  roles:
+   - server_create
+
+- hosts: servers
+  become: true
+  roles:
+   - server_setup
+
+- hosts: slaves
+  become: true
+  roles:
+  - slave_setup
+
